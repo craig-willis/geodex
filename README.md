@@ -2,12 +2,30 @@
 
 ## Prerequisites
 * Assumes Ubuntu LTS
-* Go (`apt-get install golang`)
-* Go dep
-* Docker
+* go, go-dep
+* docker, docker-compose
+
+```
+sudo apt-get update -y
+sudo apt-get install -y golang docker.io go-dep
+sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+sudo usermod -a -G docker ubuntu
+docker swarm init
+```
+
+Modify `.bash_profile` and change `PATH`:
+```
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+Logout and login again for group and PATH changes to take effect.
 
 
 ## Checkout source
+
+To run without building, you only need the `gleaner` and this `geodex` repository. Images for the other services have been built and pushed.
+
 ```
 mkdir -p ~/go/src/earthcube.org/Project418/
 cd go/src/earthcube.org/Project418
@@ -15,11 +33,12 @@ git clone https://github.com/earthcube/gleaner -b eco
 git clone https://github.com/earthcube/services -b eco
 git clone https://github.com/earthcube/webui -b eco
 git clone https://github.com/earthcube/webUI2 -b eco
+git clone https://github.com/craig-willis/geodex
 ```
 
 
-## Building 
-
+## Building components
+This shows how to build individual components and images.
 
 ```
 cd gleaner
@@ -47,43 +66,44 @@ docker build -t geocodes/p418webui2 .
 ```
 
 
-## Running 
+## Running Gleaner
 
-For Gleaner, see also the ECO [README](https://github.com/earthcube/gleaner/blob/eco/docs/starterpack/README.md).
+For more information about running Gleaner, see also the ECO [README](https://github.com/earthcube/gleaner/blob/eco/docs/starterpack/README.md).
 
+Start the Gleaner backend:
 ```
 cd gleaner/docs/starterpack/
 . demo-exp.env
 docker-compose -f gleaner-compose-ECAM.yml  up
 ```
-
-This will index IEDA using spatial, text, graph millers (`configs/eco.yaml`)
+Index IEDA using spatial, text, graph millers (`configs/eco.yaml`)
 ```
 cd gleaner
 ./runGleaner.sh -setup
 ./runGleaner.sh
 ```
 
-Create /etc/hosts entry for `geodex.local.earthcube.org`:
+For development purposes, create /etc/hosts entry for `geodex.local.earthcube.org`:
 ```
 127.0.0.1  geodex.local.earthcube.org
 ``` 
 
 To run the web services in this repo:
 ```
+cd geodex
 docker-compose up
 ```
 
-If running on a VM, forward ports 8080 and 80:
+If running on a VM, forward pors 80 and 443:
 ```
-ssh -L 8080:localhost:8080 -L 80:localhost:80  you@vm
+ssh -L 443:localhost:443 -L 80:localhost:80  you@vm
 ```
 
 Test the following URLs:
-* http://geodex.local.earthcube.org/ Geodex main landing page
-* http://geodex.local.earthcube.org/geocodes/ Geocodes text/spatial search
-* http://geodex.local.earthcube.org/geocodes/textSearch.html Text search for IEDA only. Search for "coral" ([api call](http://geodex.local.earthcube.org/api/v1/textindex/search?q=coral&s=0&i=ieda&n=10))
-* http://geodex.local.earthcube.org/geocodes/spatialSearch.html Search for [-125.40664,44.4617] ([api call](* http://geodex.local.earthcube.org/api/v1/spatial/search/object?geowithin={%22type%22:%22FeatureCollection%22,%22features%22:[{%22type%22:%22Feature%22,%22geometry%22:{%22type%22:%22Point%22,%22coordinates%22:[-125.40664,44.4617]},%22properties%22:{}}]}))
+* https://geodex.local.earthcube.org/ Geodex main landing page
+* https://geodex.local.earthcube.org/geocodes/ Geocodes text/spatial search
+* https://geodex.local.earthcube.org/geocodes/textSearch.html Text search for IEDA only. Search for "coral" ([api call](http://geodex.local.earthcube.org/api/v1/textindex/search?q=coral&s=0&i=ieda&n=10))
+* https://geodex.local.earthcube.org/geocodes/spatialSearch.html Search for [-125.40664,44.4617] ([api call](* http://geodex.local.earthcube.org/api/v1/spatial/search/object?geowithin={%22type%22:%22FeatureCollection%22,%22features%22:[{%22type%22:%22Feature%22,%22geometry%22:{%22type%22:%22Point%22,%22coordinates%22:[-125.40664,44.4617]},%22properties%22:{}}]}))
 
 ## Things to note:
 
