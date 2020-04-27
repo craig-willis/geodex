@@ -31,13 +31,13 @@ services:
     ports:
       - 6789
     environment:
-      - GEODEX_HOST=geodex.local.earthcube.org
+      - GEODEX_HOST=geocodes.local.earthcube.org
     volumes:
       - "/bleve:/indexes:ro"
       - "./indexcatalog.json:/indexcatalog.json"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`geodex.local.earthcube.org`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.api.rule=Host(`geocodes.local.earthcube.org`) && PathPrefix(`/api`)"
       - "traefik.http.routers.api.entrypoints=websecure"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.tls.certresolver=myresolver"
@@ -45,12 +45,12 @@ services:
   geodex:
     image: geocodes/p418webui
     environment:
-      - GEODEX_HOST=geodex.local.earthcube.org
+      - GEODEX_HOST=geocodes.local.earthcube.org
     ports:
       - 9900
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.geodex.rule=Host(`geodex.local.earthcube.org`)"
+      - "traefik.http.routers.geodex.rule=Host(`geocodes.local.earthcube.org`) && PathPrefix(`/geodex`)"
       - "traefik.http.routers.geodex.entrypoints=websecure"
       - "traefik.http.routers.geodex.tls=true"
       - "traefik.http.routers.geodex.tls.certresolver=myresolver"
@@ -58,12 +58,12 @@ services:
   geocodes:
     image: geocodes/p418webui2
     environment:
-      - GEODEX_HOST=geodex.local.earthcube.org
+      - GEODEX_HOST=geocodes.local.earthcube.org
     ports:
       - 80
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.geocodes.rule=Host(`geodex.local.earthcube.org`) && PathPrefix(`/geocodes`)"
+      - "traefik.http.routers.geocodes.rule=Host(`geocodes.local.earthcube.org`)"
       - "traefik.http.routers.geocodes.entrypoints=websecure"
       - "traefik.http.routers.geocodes.tls=true"
       - "traefik.http.routers.geocodes.tls.certresolver=myresolver"

@@ -83,9 +83,9 @@ cd gleaner
 ./runGleaner.sh
 ```
 
-For development purposes, create /etc/hosts entry for `geodex.local.earthcube.org`:
+For development purposes, create /etc/hosts entry for `geocodes.local.earthcube.org`:
 ```
-127.0.0.1  geodex.local.earthcube.org
+127.0.0.1  geocodes.local.earthcube.org
 ``` 
 
 To run the web services in this repo:
@@ -100,10 +100,10 @@ ssh -L 443:localhost:443 -L 80:localhost:80  you@vm
 ```
 
 Test the following URLs:
-* https://geodex.local.earthcube.org/ Geodex main landing page
-* https://geodex.local.earthcube.org/geocodes/ Geocodes text/spatial search
-* https://geodex.local.earthcube.org/geocodes/textSearch.html Text search for IEDA only. Search for "coral" ([api call](http://geodex.local.earthcube.org/api/v1/textindex/search?q=coral&s=0&i=ieda&n=10))
-* https://geodex.local.earthcube.org/geocodes/spatialSearch.html Search for [-125.40664,44.4617] ([api call](* http://geodex.local.earthcube.org/api/v1/spatial/search/object?geowithin={%22type%22:%22FeatureCollection%22,%22features%22:[{%22type%22:%22Feature%22,%22geometry%22:{%22type%22:%22Point%22,%22coordinates%22:[-125.40664,44.4617]},%22properties%22:{}}]}))
+* https://geocodes.local.earthcube.org/ GeoCodes main landing page
+* https://geocodes.local.earthcube.org/textSearch.html Text search for IEDA only. Search for "coral" ([api call](http://geocodes.local.earthcube.org/api/v1/textindex/search?q=coral&s=0&i=ieda&n=10))
+* https://geocodes.local.earthcube.org/spatialSearch.html Search for [-125.40664,44.4617] ([api call](* http://geocodes.local.earthcube.org/api/v1/spatial/search/object?geowithin={%22type%22:%22FeatureCollection%22,%22features%22:[{%22type%22:%22Feature%22,%22geometry%22:{%22type%22:%22Point%22,%22coordinates%22:[-125.40664,44.4617]},%22properties%22:{}}]}))
+* https://geocodes.local.earthcube.org/geodex Geodex main landing page
 
 ## Things to note:
 
