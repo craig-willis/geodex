@@ -74,3 +74,20 @@ services:
      - 9851
     volumes:
       - "/home/ubuntu/go/src/earthcube.org/Project418/gleaner/docs/starterpack/DV/spatialindex:/data"
+
+  blazegraph:
+    image: metaphacts/blazegraph-basic
+    ports:
+      - 8080
+    environment:
+      JAVA_XMS: 1024m
+      JAVA_XMX: 2g
+    restart: on-failure
+    volumes:
+      - "/home/ubuntu/go/src/earthcube.org/Project418/gleaner/docs/starterpack/DV/blazegraph-data:/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.blazegraph.rule=Host(`geocodes-dev.earthcube.org`) && PathPrefix(`/blazegraph`)"
+      - "traefik.http.routers.blazegraph.entrypoints=websecure"
+      - "traefik.http.routers.blazegraph.tls=true"
+      - "traefik.http.routers.blazegraph.tls.certresolver=myresolver"
