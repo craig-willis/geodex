@@ -99,5 +99,65 @@ services:
       - "traefik.http.middlewares.beta.headers.addvaryheader=true"
     networks:
       - traefik_default
+  yasgui:
+    image: erikap/yasgui
+    restart: unless-stopped
+    environment:
+      DEFAULT_SPARQL_ENDPOINT: "https://graph.geodex.org/blazegraph/namespace/nabu/sparql"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sparqlgui.entrypoints=http"
+      - "traefik.http.routers.sparqlgui.priority=92"
+      - "traefik.http.routers.sparqlgui.rule=Host(`${SERVER}.${HOST:?HOST environment varaible is required}` ) && PathPrefix(`/sparqlgui`) "
+      #      - "traefik.http.routers.alpha.rule=Host(`${HOST:?HOST environment varaible is required}`) "
+      - "traefik.http.routers.sparqlgui.service=sparqlgui"
+      - "traefik.http.middlewares.sparqlgui-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.sparqlgui.middlewares=sparqlgui-https-redirect"
+      - "traefik.http.routers.sparqlgui-secure.priority=94"
+      - "traefik.http.routers.sparqlgui-secure.entrypoints=https"
+      - "traefik.http.routers.sparqlgui-secure.rule=Host(`alpha.${HOST:?HOST environment is required}`) && PathPrefix(`/sparqlgui`)"
+      - "traefik.http.routers.sparqlgui-secure.tls=true"
+      - "traefik.http.routers.sparqlgui-secure.tls.certresolver=http"
+      - "traefik.http.routers.sparqlgui-secure.service=sparqlgui"
+      - "traefik.http.services.sparqlgui.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.http.middlewares.sparqlgui.headers.accesscontrolallowmethods=GET,OPTIONS,POST"
+      - "traefik.http.middlewares.sparqlgui.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.sparqlgui.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.sparqlgui.headers.addvaryheader=true"
+      #      - "traefik.http.middlewares.client_prefix.stripprefixregex.regex=/client/[a-z0-9]+/[0-9]+/"
+      - "traefik.http.middlewares.sparqlgui_prefix.StripPrefix.prefixes=/sparqlgui"
+      - "traefik.http.routers.sparqlgui-secure.middlewares=sparqlgui_prefix"
+    networks:
+      - traefik_default
+  notebook-proxy:
+    image: nsfearthcube/mknb:latest
+    restart: unless-stopped
+    #build: ./client
+    environment:
+      - GITHUB_SECRET=${GITHUB_SECRET}
+      - GITHUB_CLIENTID=${GITHUB_CLIENTID}
+      - DOMAIN=https://${SERVER}.${HOST:?HOST environment varaible is required}/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nb.entrypoints=http"
+      - "traefik.http.routers.nb.priority=13"
+      - "traefik.http.routers.nb.rule=Host(`${SERVER}.${HOST:?HOST environment varaible is required}`) && PathPrefix(`/notebook`)"
+      - "traefik.http.middlewares.nb-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.nb.middlewares=nb-https-redirect"
+      - "traefik.http.routers.nb-secure.entrypoints=https"
+      - "traefik.http.routers.nb-secure.priority=12"
+      - "traefik.http.routers.nb-secure.rule=Host(`${SERVER}.${HOST:?HOST environment is required}`) && PathPrefix(`/notebook`)"
+      - "traefik.http.routers.nb-secure.tls=true"
+      - "traefik.http.routers.nb-secure.tls.certresolver=http"
+      - "traefik.http.routers.nb-secure.service=beta"
+      - "traefik.http.services.nb.loadbalancer.server.port=3031"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.http.middlewares.nb.headers.accesscontrolallowmethods=GET,OPTIONS,POST"
+      - "traefik.http.middlewares.nb.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.nb.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.nb.headers.addvaryheader=true"
+    networks:
+      - traefik_default
 networks:
   traefik_default:
