@@ -150,13 +150,15 @@ services:
       - "traefik.http.routers.nb-secure.rule=Host(`${SERVER}.${HOST:?HOST environment is required}`) && PathPrefix(`/notebook`)"
       - "traefik.http.routers.nb-secure.tls=true"
       - "traefik.http.routers.nb-secure.tls.certresolver=http"
-      - "traefik.http.routers.nb-secure.service=beta"
+      - "traefik.http.routers.nb-secure.service=nb"
       - "traefik.http.services.nb.loadbalancer.server.port=3031"
       - "traefik.docker.network=traefik_default"
       - "traefik.http.middlewares.nb.headers.accesscontrolallowmethods=GET,OPTIONS,POST"
       - "traefik.http.middlewares.nb.headers.accesscontrolalloworigin=*"
       - "traefik.http.middlewares.nb.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.nb.headers.addvaryheader=true"
+      - "traefik.http.middlewares.nb_prefix.StripPrefix.prefixes=/notebook"
+      - "traefik.http.routers.nb-secure.middlewares=nb_prefix"
     networks:
       - traefik_default
 networks:
