@@ -68,20 +68,21 @@ If the examples, or the tools are updated, then they need to be manually summone
 
 ### Gleaner/glcon notes
 
-This should be split into two calls, at least until google drive reader becomes available
+Sources found at; https://docs.google.com/spreadsheets/d/1G7Wylo9dLlq3tmXe8E8lZDFNKFDuoIEeEZd3epS0ggQ/edit#gid=567896613
 
-or a s
 
 ```csv
-hack,SourceType,Active,Name,ProperName,URL,Headless,Domain,PID,Logo,base_url,base_uri,count,cdf_membership,summary
-51,sitemap,TRUE,ecrr_submitted,Earthcube Resource Registry,rclone https://drive.google.com/drive/u/0/folders/1TacUQqjpBbGsPQ8JPps47lBXMQsNBRnd,FALSE,http://www.earthcube.org/resourceregistry/,,https://www.earthcube.org/sites/default/files/doc-repository/logo_earthcube_full_horizontal.png,http://earthcube.org/resource_registry,,274,,"The EarthCube Resource Registry (ECRR) is intended to provide immediate access to a list of EC capabilities to understand what EC is, and what it isn‚Äôt. To support this goal, the ECRR project has developed several persistent resources available for wider EarthCube use"
-52,sitemap,TRUE,ecrr_examples,Earthcube Resource Registry Examples,https://raw.githubusercontent.com/earthcube/ecrro/master/Examples/sitemap.xml,FALSE,http://www.earthcube.org/resourceregistry/examples,,https://www.earthcube.org/sites/default/files/doc-repository/logo_earthcube_full_horizontal.png,http://earthcube.org/resource_registry,,274,,"The EarthCube Resource Registry (ECRR) is intended to provide immediate access to a list of EC capabilities to understand what EC is, and what it isn‚Äôt. To support this goal, the ECRR project has developed several persistent resources available for wider EarthCube use"
-54,sitemap,TRUE,geocodes_examples,GeoCodes Tools Examples, https://raw.githubusercontent.com/earthcube/GeoCODES-Metadata/main/sitemap.xml,FALSE,https://raw.githubusercontent.com/earthcube/GeoCODES-Metadata/,,,,,,,
+hack,SourceType,Active,CredentialsFile,Name,ProperName,URL,Headless,Domain,PID,Logo,base_url,base_uri,count,cdf_membership,summary
+51,googledrive,TRUE,configs/credentials/gleaner-331805-030e15e1d9c4.json,ecrr_submitted,Earthcube Resource Registry,https://drive.google.com/drive/u/0/folders/1TacUQqjpBbGsPQ8JPps47lBXMQsNBRnd,FALSE,http://www.earthcube.org/resourceregistry/,,https://www.earthcube.org/sites/default/files/doc-repository/logo_earthcube_full_horizontal.png,http://earthcube.org/resource_registry,,274,,"The EarthCube Resource Registry (ECRR) is intended to provide immediate access to a list of EC capabilities to understand what EC is, and what it isn‚Äôt. To support this goal, the ECRR project has developed several persistent resources available for wider EarthCube use"
+52,sitemap,TRUE,,ecrr_examples,Earthcube Resource Registry Examples,https://raw.githubusercontent.com/earthcube/ecrro/master/Examples/sitemap.xml,FALSE,http://www.earthcube.org/resourceregistry/examples,,https://www.earthcube.org/sites/default/files/doc-repository/logo_earthcube_full_horizontal.png,http://earthcube.org/resource_registry,,274,,"The EarthCube Resource Registry (ECRR) is intended to provide immediate access to a list of EC capabilities to understand what EC is, and what it isn‚Äôt. To support this goal, the ECRR project has developed several persistent resources available for wider EarthCube use"
+54,sitemap,TRUE,,geocodes_examples,GeoCodes Tools Examples, https://raw.githubusercontent.com/earthcube/GeoCODES-Metadata/main/sitemap.xml,FALSE,https://raw.githubusercontent.com/earthcube/GeoCODES-Metadata/,,,,,,,
 ```
 
 ### rclone notes
 
-rclone
+_Note: rclone my no longer be needed with the googledrive capable gleaner, and github actions creating sitemaps of folders_
+
+rclone is used to sync files from the google drive to the s3.
 
 rclone config
 add the following:

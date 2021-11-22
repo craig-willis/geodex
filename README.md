@@ -1,4 +1,5 @@
 # Running the Geodex / GeoCODES services
+**outdated**
 
 ## Prerequisites
 * Assumes Ubuntu LTS
