@@ -1,0 +1,134 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:v2.0.2
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_default
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/blkstr0/dvol/traefik/traefik.yml:/traefik.yml:ro
+      - /mnt/blkstr0/dvol/traefik/acme/acme.json:/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`admin.geodex.org`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$KvvXT.Bz$$wSzv.UV1OLZn48/mwm8pU/"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`admin.geodex.org`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=http"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+  triplestore:
+    image: nawer/blazegraph 
+    #image: metaphacts/blazegraph-basic
+    environment:
+      JAVA_XMS: 1024m
+      JAVA_XMX: 2g
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.triplestore.entrypoints=http"
+      - "traefik.http.routers.triplestore.rule=Host(`graph.geodex.org`)"
+      - "traefik.http.middlewares.triplestore-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.triplestore.middlewares=triplestore-https-redirect"
+      - "traefik.http.routers.triplestore-secure.entrypoints=https"
+      - "traefik.http.routers.triplestore-secure.rule=Host(`graph.geodex.org`)"
+      - "traefik.http.routers.triplestore-secure.tls=true"
+      - "traefik.http.routers.triplestore-secure.tls.certresolver=http"
+      - "traefik.http.routers.triplestore-secure.service=triplestore"
+      - "traefik.http.middlewares.triplestore-secure.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST"
+      - "traefik.http.middlewares.triplestore-secure.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.triplestore-secure.headers.accesscontrolmaxage=200"
+      - "traefik.http.middlewares.triplestore-secure.headers.addvaryheader=true"
+      - "traefik.http.middlewares.triplestore-secure.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.triplestore-secure.headers.accesscontrolallowheaders=Authorization,Origin,Content-Type,Accept"
+      - "traefik.http.middlewares.triplestore-secure.headers.customresponseheaders.Access-Control-Allow-Headers=Authorization,Origin,Content-Type,Accept"
+      - "traefik.http.routers.triplestore-secure.middlewares=triplestore-secure@docker" 
+      - "traefik.http.services.triplestore.loadbalancer.server.port=9999"
+      - "traefik.docker.network=traefik_default"
+    volumes:
+      - /mnt/blkstr0/dvol/blazegraph-data:/var/lib/blazegraph
+    networks:
+      - traefik_default
+  s3system:
+    image: minio/minio:latest
+    ports:
+      - 9000:9000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.s3system.entrypoints=http"
+      - "traefik.http.routers.s3system.rule=Host(`oss.geodex.org`)"
+      - "traefik.http.middlewares.s3system-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.s3system.middlewares=s3system-https-redirect"
+      - "traefik.http.routers.s3system-secure.entrypoints=https"
+      - "traefik.http.routers.s3system-secure.rule=Host(`oss.geodex.org`)"
+      - "traefik.http.routers.s3system-secure.tls=true"
+      - "traefik.http.routers.s3system-secure.tls.certresolver=http"
+      - "traefik.http.routers.s3system-secure.service=s3system"
+      - "traefik.http.services.s3system.loadbalancer.server.port=9000"
+      - "traefik.docker.network=traefik_default"
+    volumes:
+      - /mnt/blkstr0/dvol/s3/Data:/data
+    environment:
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    networks:
+      - traefik_default
+    command: ["server", "/data"]
+  koop:
+    image: fils/koop:1.0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.koop.entrypoints=http"
+      - "traefik.http.routers.koop.rule=Host(`spatial.geodex.org`)"
+      - "traefik.http.middlewares.koop-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.koop.middlewares=koop-https-redirect"
+      - "traefik.http.routers.koop-secure.entrypoints=https"
+      - "traefik.http.routers.koop-secure.rule=Host(`spatial.geodex.org`)"
+      - "traefik.http.routers.koop-secure.tls=true"
+      - "traefik.http.routers.koop-secure.tls.certresolver=http"
+      - "traefik.http.routers.koop-secure.service=koop"
+      - "traefik.http.services.koop.loadbalancer.server.port=9000"
+      - "traefik.docker.network=traefik_default"
+    networks:
+      - traefik_default
+  features:
+    image: fils/grow-general:latest
+    environment:
+      - S3ADDRESS=s3system:9000
+      - S3BUCKET=sites
+      - S3PREFIX=geodex
+      - DOMAIN=https://alpha.geodex.org/
+      - S3KEY=AKIAIOSFODNN7EXAMPLE
+      - S3SECRET=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.features.entrypoints=http"
+      - "traefik.http.routers.features.rule=Host(`alpha.geodex.org`)"
+      - "traefik.http.middlewares.features-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.features.middlewares=features-https-redirect"
+      - "traefik.http.routers.features-secure.entrypoints=https"
+      - "traefik.http.routers.features-secure.rule=Host(`alpha.geodex.org`)"
+      - "traefik.http.routers.features-secure.tls=true"
+      - "traefik.http.routers.features-secure.tls.certresolver=http"
+      - "traefik.http.routers.features-secure.service=features"
+      - "traefik.http.services.features.loadbalancer.server.port=8080"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.http.middlewares.features.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST"
+      - "traefik.http.middlewares.features.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.features.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.features.headers.addvaryheader=true"
+    networks:
+      - traefik_default
+networks:
+  traefik_default:
