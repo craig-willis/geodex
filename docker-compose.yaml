@@ -62,10 +62,12 @@ services:
     networks:
       - traefik_default
   s3system:
-    image: minio/minio:latest
+#    image: minio/minio:latest
+    image: quay.io/minio/minio
     restart: unless-stopped
     ports:
       - 9000:9000
+      - 9001:9001
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.s3system.entrypoints=http"
@@ -78,15 +80,28 @@ services:
       - "traefik.http.routers.s3system-secure.tls.certresolver=http"
       - "traefik.http.routers.s3system-secure.service=s3system"
       - "traefik.http.services.s3system.loadbalancer.server.port=9000"
+      - "traefik.http.routers.s3admin.entrypoints=http"
+      - "traefik.http.routers.s3admin.rule=Host(`minioadmin.${HOST:?HOST environment varaible is required}`)"
+      - "traefik.http.middlewares.s3admin-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.s3admin.middlewares=s3admin-https-redirect"
+      - "traefik.http.routers.s3admin-secure.entrypoints=https"
+      - "traefik.http.routers.s3admin-secure.rule=Host(`minioadmin.${HOST:?HOST environment varaible is required}`)"
+      - "traefik.http.routers.s3admin-secure.tls=true"
+      - "traefik.http.routers.s3admin-secure.tls.certresolver=http"
+      - "traefik.http.routers.s3admin-secure.service=s3admin"
+      - "traefik.http.services.s3admin.loadbalancer.server.port=9001"
       - "traefik.docker.network=traefik_default"
     volumes:
       - /data/s3/Data:/data
     environment:
-      - MINIO_ACCESS_KEY=${S3KEY}
-      - MINIO_SECRET_KEY=${S3SECRET}
+#      - MINIO_ACCESS_KEY=${S3KEY}
+#      - MINIO_SECRET_KEY=${S3SECRET}
+      MINIO_ROOT_USER: ${S3KEY}
+      MINIO_ROOT_PASSWORD: ${S3SECRET}
     networks:
       - traefik_default
-    command: ["server", "/data"]
+#    command: ["server","/data/", "--console-address \":9001\""]
+    command: server /data --console-address ":9001"
   headless:
     image: chromedp/headless-shell:latest
     restart: unless-stopped
