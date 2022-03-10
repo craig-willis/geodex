@@ -13,16 +13,22 @@ This is the project for the configuration of the docker stack for the geocodes p
 
 ## Prerequisites
 * Assumes Ubuntu LTS
+
 * Docker
 * optional, since binaries are built
   * Go (`apt-get install golang`)
   * Go dep
 
+
 ## DNS Suggested
 NEED A LIST OF THE DNS NAMES HERE
 
 ## Checkout source
+
+To run without building, you only need the `gleaner` and this `geodex` repository. Images for the other services have been built and pushed.
+
 ```
+
 mkdir geodex
 cd geodex
 git clone https://github.com/earthcube/geodex 
@@ -50,5 +56,6 @@ nano env.beta
 ```shell
 ./refresh_all.sh
 ```
+
 
 

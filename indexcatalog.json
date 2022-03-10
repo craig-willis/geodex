@@ -6,7 +6,9 @@
         "index": "ieda",
         "name": "IEDA"
     },
+
     {
+
         "description": "HydroShare; operated by The Consortium of Universities for the Advancement of Hydrologic Science Inc.",
         "logo": "http://geodex.org/images/logos/cuahsiHydroshare.png",
         "indexlocation": "./indexes/wwwhydroshareorg",
@@ -32,5 +34,6 @@
         "indexlocation": "./indexes/dsirisedu",
         "index": "iris",
         "name": "IRIS"
+
     }
 ]
