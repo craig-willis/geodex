@@ -90,6 +90,16 @@ services:
       - "traefik.http.routers.s3admin-secure.tls.certresolver=http"
       - "traefik.http.routers.s3admin-secure.service=s3admin"
       - "traefik.http.services.s3admin.loadbalancer.server.port=9001"
+      - "traefik.http.middlewares.s3system-secure.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST"
+      - "traefik.http.middlewares.s3system-secure.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.s3system-secure.headers.accesscontrolmaxage=200"
+      - "traefik.http.middlewares.s3system-secure.headers.addvaryheader=true"
+      - "traefik.http.middlewares.s3system-secure.headers.accesscontrolallowcredentials=true"
+#      - "traefik.http.middlewares.s3system-secure.headers.accesscontrolallowheaders=Authorization,Origin,Content-Type,Accept"
+      - "traefik.http.middlewares.s3system-secure.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.s3system-secure.headers.customresponseheaders.Access-Control-Allow-Headers=*"
+#      - "traefik.http.middlewares.s3system-secure.headers.customresponseheaders.Access-Control-Allow-Headers=Authorization,Origin,Content-Type,Accept"
+      - "traefik.http.routers.s3system-secure.middlewares=s3system-secure@docker"
       - "traefik.docker.network=traefik_default"
     volumes:
       - /data/s3/Data:/data
